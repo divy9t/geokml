@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"geokml/structs"
+	"github.com/divy9t/geokml/structs"
 	"math"
 )
 import "github.com/flywave/go-earcut"

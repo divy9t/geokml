@@ -31,12 +31,3 @@ func getNodesFromKmlFile(kmlPath string) ([]*xmlquery.Node, error) {
 	return nodes, nil
 
 }
-
-func getPolygonFromNodes(nodes []*xmlquery.Node) []string {
-	var polygons []string
-	for _, node := range nodes {
-		polygons = append(polygons, node.InnerText())
-	}
-	return polygons
-
-}
