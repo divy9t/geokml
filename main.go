@@ -10,7 +10,7 @@ import (
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
 func main() {
-	geohashes, err := utils.ExtractGeohashesFromKML("INTERCITY_100KM_C.kml", 6)
+	geohashes, err := utils.ExtractGeohashesFromKML("example.kml", 8)
 	if err != nil {
 		log.Fatalf("Error extracting geohashes: %v", err)
 	}

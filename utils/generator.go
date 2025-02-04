@@ -1,6 +1,9 @@
 package utils
 
-import "geokml/structs"
+import (
+	"geokml/structs"
+	"math"
+)
 import "github.com/flywave/go-earcut"
 import "github.com/mmcloughlin/geohash"
 
@@ -53,38 +56,60 @@ func generateGeohashesForSinglePolygon(polygon *structs.Polygon, precision uint)
 	return expandedHashes
 }
 
-// getInteriorPointByTriangulation finds a valid point inside the polygon using triangulation
+func triangleArea(a, b, c structs.Coordinate) float64 {
+	return math.Abs((a.Lng*(b.Lat-c.Lat) + b.Lng*(c.Lat-a.Lat) + c.Lng*(a.Lat-b.Lat)) / 2)
+}
+
 func getInteriorPointByTriangulation(polygon []structs.Coordinate) structs.Coordinate {
-	// Prepare input for earcut: convert to a flat array of [x, y] points
+	// Prepare input for earcut: convert to a flat array of [x, y] points.
 	var flatCoords []float64
 	for _, coord := range polygon {
 		flatCoords = append(flatCoords, coord.Lng, coord.Lat) // [lng1, lat1, lng2, lat2, ...]
 	}
 
-	// Perform triangulation using earcut
+	// Perform triangulation using earcut.
 	triangles, err := earcut.Earcut(flatCoords, nil, 2) // 2 indicates [x, y] pairs
-	if err != nil {
-		return polygon[0] // Fallback to the first vertex
+	if err != nil || len(triangles) < 3 {
+		// Fallback if triangulation fails.
+		return polygon[0]
 	}
-	// Iterate through the triangles and find the centroid of each
+
+	var bestCentroid structs.Coordinate
+	maxArea := -1.0
+	found := false
+
+	// Iterate through the triangles.
 	for i := 0; i < len(triangles); i += 3 {
-		// Get vertices of the triangle
-		aIndex, bIndex, cIndex := triangles[i]*2, triangles[i+1]*2, triangles[i+2]*2
+		// Get vertices of the triangle.
+		aIndex := triangles[i] * 2
+		bIndex := triangles[i+1] * 2
+		cIndex := triangles[i+2] * 2
 		a := structs.Coordinate{Lng: flatCoords[aIndex], Lat: flatCoords[aIndex+1]}
 		b := structs.Coordinate{Lng: flatCoords[bIndex], Lat: flatCoords[bIndex+1]}
 		c := structs.Coordinate{Lng: flatCoords[cIndex], Lat: flatCoords[cIndex+1]}
 
-		// Calculate the centroid of the triangle
-		centroidLat := (a.Lat + b.Lat + c.Lat) / 3
-		centroidLng := (a.Lng + b.Lng + c.Lng) / 3
-		centroid := structs.Coordinate{Lat: centroidLat, Lng: centroidLng}
+		// Calculate the centroid of the triangle.
+		centroid := structs.Coordinate{
+			Lat: (a.Lat + b.Lat + c.Lat) / 3,
+			Lng: (a.Lng + b.Lng + c.Lng) / 3,
+		}
 
-		// Check if the centroid is inside the polygon
+		// Check if the centroid is inside the polygon.
 		if pointInPolygon(centroid, polygon) {
-			return centroid // Found a valid interior point
+			area := triangleArea(a, b, c)
+			if area > maxArea {
+				maxArea = area
+				bestCentroid = centroid
+				found = true
+			}
 		}
 	}
 
-	// Fallback to the first vertex if no valid point is found
+	// If a valid centroid was found from the largest triangle, return it.
+	if found {
+		return bestCentroid
+	}
+
+	// Fallback: return the first vertex if no valid interior point was found.
 	return polygon[0]
 }
