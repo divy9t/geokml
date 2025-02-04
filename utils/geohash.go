@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+// ExtractGeohashesFromKML parses the given KML file at kmlPath,
+// extracts coordinate data from polygons, and generates geohashes
+// with the specified precision.
+//
+// kmlPath: The path to the KML file.
+// precision: The desired geohash precision.
+// Returns: A set of geohashes covering the KML-defined regions, or an error if parsing fails.
 func ExtractGeohashesFromKML(kmlPath string, precision uint) (map[string]struct{}, error) {
 	// Extract coordinates nodes
 	nodes, err := getNodesFromKmlFile(kmlPath)

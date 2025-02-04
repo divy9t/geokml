@@ -7,6 +7,7 @@ import (
 import "github.com/flywave/go-earcut"
 import "github.com/mmcloughlin/geohash"
 
+// GenerateGeohashesForPolygon generates geohashes that cover the entire polygon area
 func GenerateGeohashesForPolygon(polygons []structs.Polygon, precision uint) map[string]struct{} {
 	geohashes := make(map[string]struct{})
 	for _, polygon := range polygons {
@@ -19,7 +20,7 @@ func GenerateGeohashesForPolygon(polygons []structs.Polygon, precision uint) map
 
 }
 
-// generateGeohashesForPolygon generates geohashes that cover the entire polygon area
+// GenerateGeohashesForSinglePolygon generates geohashes that cover the entire area of a single polygon
 func generateGeohashesForSinglePolygon(polygon *structs.Polygon, precision uint) map[string]struct{} {
 	expandedHashes := make(map[string]struct{})
 	var queue []string
@@ -60,6 +61,7 @@ func triangleArea(a, b, c structs.Coordinate) float64 {
 	return math.Abs((a.Lng*(b.Lat-c.Lat) + b.Lng*(c.Lat-a.Lat) + c.Lng*(a.Lat-b.Lat)) / 2)
 }
 
+// GetInteriorPointByTriangulation returns an interior point of the polygon using triangulation.
 func GetInteriorPointByTriangulation(polygon []structs.Coordinate) structs.Coordinate {
 	// Prepare input for earcut: convert to a flat array of [x, y] points.
 	var flatCoords []float64
