@@ -12,14 +12,14 @@ func contains(p *structs.Polygon, bounds geohash.Box) bool {
 		{bounds.MaxLat, bounds.MinLng},
 		{bounds.MaxLat, bounds.MaxLng},
 	} {
-		if !pointInPolygon(point, p.Coordinates) {
+		if !PointInPolygon(point, p.Coordinates) {
 			return false
 		}
 	}
 	return true
 }
 
-func pointInPolygon(point structs.Coordinate, polygon []structs.Coordinate) bool {
+func PointInPolygon(point structs.Coordinate, polygon []structs.Coordinate) bool {
 	n := len(polygon)
 	inside := false
 

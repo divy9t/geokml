@@ -16,7 +16,7 @@ func ExtractGeohashesFromKML(kmlPath string, precision uint) (map[string]struct{
 	// Create polygons from parsed coordinates
 	var polygons []structs.Polygon
 	for _, node := range nodes {
-		coords := parseCoordinates(node.InnerText())
+		coords := ParseCoordinates(node.InnerText())
 		if len(coords) < 3 {
 			continue
 		}
@@ -29,8 +29,8 @@ func ExtractGeohashesFromKML(kmlPath string, precision uint) (map[string]struct{
 	return geohashes, nil
 }
 
-// parseCoordinates parses the KML coordinates string into a slice of Coordinates
-func parseCoordinates(coordString string) []structs.Coordinate {
+// ParseCoordinates parses the KML coordinates string into a slice of Coordinates
+func ParseCoordinates(coordString string) []structs.Coordinate {
 	var coordinates []structs.Coordinate
 	// Split by spaces (coordinate pairs)
 	pairs := strings.Fields(coordString)

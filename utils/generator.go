@@ -24,7 +24,7 @@ func generateGeohashesForSinglePolygon(polygon *structs.Polygon, precision uint)
 	expandedHashes := make(map[string]struct{})
 	var queue []string
 
-	interiorPoint := getInteriorPointByTriangulation(polygon.Coordinates)
+	interiorPoint := GetInteriorPointByTriangulation(polygon.Coordinates)
 
 	initialGeohash := geohash.EncodeWithPrecision(interiorPoint.Lat, interiorPoint.Lng, precision)
 	queue = append(queue, initialGeohash)
@@ -60,7 +60,7 @@ func triangleArea(a, b, c structs.Coordinate) float64 {
 	return math.Abs((a.Lng*(b.Lat-c.Lat) + b.Lng*(c.Lat-a.Lat) + c.Lng*(a.Lat-b.Lat)) / 2)
 }
 
-func getInteriorPointByTriangulation(polygon []structs.Coordinate) structs.Coordinate {
+func GetInteriorPointByTriangulation(polygon []structs.Coordinate) structs.Coordinate {
 	// Prepare input for earcut: convert to a flat array of [x, y] points.
 	var flatCoords []float64
 	for _, coord := range polygon {
@@ -95,7 +95,7 @@ func getInteriorPointByTriangulation(polygon []structs.Coordinate) structs.Coord
 		}
 
 		// Check if the centroid is inside the polygon.
-		if pointInPolygon(centroid, polygon) {
+		if PointInPolygon(centroid, polygon) {
 			area := triangleArea(a, b, c)
 			if area > maxArea {
 				maxArea = area
