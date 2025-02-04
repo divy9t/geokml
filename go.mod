@@ -1,4 +1,4 @@
-module geokml
+module github.com/divy9t/geokml
 
 go 1.23
 
